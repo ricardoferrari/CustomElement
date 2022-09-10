@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+    <head>
+        <title>Teste de Web Components</title>
+    </head>
+    <body>
+        <div>
+            <button class="add">Add custom-element to DOM</button>
+        </div>
+        
+        <script>
+            class MeuElemento extends HTMLElement {
+                // Specify observed attributes so that
+                // attributeChangedCallback will work
+                static get observedAttributes() {
+                    return ['c', 'l'];
+                }
+                constructor() {
+                    super();
+
+                    const shadow = this.attachShadow({mode: 'open'});
+                    const style = document.createElement('style');
+                    const div = document.createElement('div');
+                    shadow.appendChild(div);
+                    shadow.appendChild(style);
+                }
+
+                connectedCallback() {
+                    console.log('Custom element added to page.');
+                    updateStyle(this);
+                }
+
+            }
+
+            customElements.define('meu-elemento', MeuElemento);
+
+            function updateStyle(elem) {
+                const shadow = elem.shadowRoot;
+                shadow.querySelector('style').textContent = `
+                    div {
+                    width: ${elem.getAttribute('l')}px;
+                    height: ${elem.getAttribute('l')}px;
+                    background-color: ${elem.getAttribute('c')};
+                    }
+                `;
+            }
+
+            const add = document.querySelector('.add');
+
+            add.onclick = function() {
+                // Create a custom element
+                let element = document.createElement('meu-elemento');
+                element.setAttribute('l', '100');
+                element.setAttribute('c', 'red');
+                document.body.appendChild(element);
+
+                add.disabled = true;
+            };
+        </script>
+    </body>
+</html>
